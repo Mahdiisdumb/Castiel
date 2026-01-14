@@ -1,6 +1,6 @@
 ﻿namespace Castiel;
 
-partial class Form1
+public partial class MainForm:Form
 {
     /// <summary>
     ///  Required designer variable.
