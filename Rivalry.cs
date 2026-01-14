@@ -7,10 +7,14 @@ namespace Castiel
     {
         static readonly string[] lines =
         {
-            "Castiel: Harris is a loudmouth. I fix things. He yaps about fixing things.",
-            "Castiel: FIRST THEY CLAIM IM A FEMBOY NOW THIS?",
-            "Castiel: Harris talks about chaos. I AM chaos.",
-            "Castiel: Water towers again? Seriously?"
+            "Castiel: Harris is chaos incarnate, can’t trust that goober.",
+            "Castiel: Harris yaps too much, classic.",
+            "Castiel: That’s typical Harris… slow, dumb, loud.",
+            "Castiel: Honestly, Mahdi is a coding genius compared to Harris.",
+            "Castiel: I fix stuff while Harris goes full chaos mode.",
+            "Castiel: Mahdi is talented, reliable… unlike Harris.",
+            "Castiel: Every time Harris opens his mouth, I sigh.",
+            "Castiel: Keep calm, Mahdi. Harris is just background noise."
         };
 
         public static void Start()
