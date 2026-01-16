@@ -1,51 +1,131 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using Microsoft.VisualBasic; // for InputBox
 
 namespace Castiel
 {
-public partial class MainForm : Form
+    public partial class MainForm : Form
     {
-        Button pick, make, mod;
+        private ListBox actions;
+        private ToolStripStatusLabel statusLabel;
 
         public MainForm()
         {
             Text = "Castiel SDK";
-            Width = 400;
-            Height = 200;
+            Width = 1000;
+            Height = 650;
+            StartPosition = FormStartPosition.CenterScreen;
 
-            pick = new Button { Text = "Pick SDSG Path", Dock = DockStyle.Top };
-            make = new Button { Text = "Make Game", Dock = DockStyle.Top };
-            mod  = new Button { Text = "Mod Game", Dock = DockStyle.Top };
+            // ===== MENU BAR =====
+            var menu = new MenuStrip();
 
-            pick.Click += PickPath;
-            make.Click += MakeGame;
-            mod.Click  += ModGame;
+            var fileMenu = new ToolStripMenuItem("File");
+            fileMenu.DropDownItems.Add("Set SDSG Path", null, (_, __) => PickPath());
+            fileMenu.DropDownItems.Add("Exit", null, (_, __) => Close());
 
-            Controls.Add(mod);
-            Controls.Add(make);
-            Controls.Add(pick);
+            var projectMenu = new ToolStripMenuItem("Project");
+            projectMenu.DropDownItems.Add("New Game", null, (_, __) => MakeGame());
+            projectMenu.DropDownItems.Add("Open Existing Game", null, (_, __) => ModGame());
 
-            Rivalry.Start(); // start random popups about Harris
+            var helpMenu = new ToolStripMenuItem("Help");
+            helpMenu.DropDownItems.Add("About Castiel", null, (_, __) =>
+                MessageBox.Show("Castiel SDK\nFor SDSG", "About"));
+
+            menu.Items.Add(fileMenu);
+            menu.Items.Add(projectMenu);
+            menu.Items.Add(helpMenu);
+
+            MainMenuStrip = menu;
+            Controls.Add(menu);
+
+            // ===== STATUS BAR =====
+            var status = new StatusStrip();
+            statusLabel = new ToolStripStatusLabel("No SDSG path selected");
+            status.Items.Add(statusLabel);
+            Controls.Add(status);
+
+            // ===== SPLIT VIEW =====
+            var split = new SplitContainer
+            {
+                Dock = DockStyle.Fill,
+                SplitterDistance = 220,
+                FixedPanel = FixedPanel.Panel1
+            };
+            Controls.Add(split);
+            split.BringToFront();
+
+            // ===== LEFT PANEL =====
+            actions = new ListBox { Dock = DockStyle.Fill };
+            actions.Items.Add("New Game");
+            actions.Items.Add("Open Game");
+            actions.SelectedIndexChanged += (s, e) =>
+            {
+                switch (actions.SelectedItem?.ToString())
+                {
+                    case "New Game": MakeGame(); break;
+                    case "Open Game": ModGame(); break;
+                }
+                actions.ClearSelected();
+            };
+            split.Panel1.Controls.Add(actions);
+
+            // ===== RIGHT PANEL =====
+            var welcome = new Label
+            {
+                Text = "Castiel SDK\n\nSelect an action from the left panel.",
+                Dock = DockStyle.Fill,
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Font = new System.Drawing.Font("Segoe UI", 12),
+            };
+            split.Panel2.Controls.Add(welcome);
+
+            // ===== Load config and update status =====
+            Config.Load();
+            if (!string.IsNullOrWhiteSpace(Config.SDSGPath))
+                statusLabel.Text = $"SDSG Path: {Config.SDSGPath}";
+
+            // ===== Start Rivalry (unhinged popups) =====
+            Rivalry.Start();  // <-- now correctly inside constructor
         }
 
-        private void PickPath(object s, EventArgs e)
+        private void PickPath()
         {
             using var f = new FolderBrowserDialog();
             if (f.ShowDialog() == DialogResult.OK)
             {
                 Config.SDSGPath = f.SelectedPath;
                 Config.Save();
+                statusLabel.Text = $"SDSG Path: {Config.SDSGPath}";
             }
         }
 
-        private void MakeGame(object s, EventArgs e)
+        private void MakeGame()
         {
-            if (Config.SDSGPath == null) return;
+            if (string.IsNullOrWhiteSpace(Config.SDSGPath))
+            {
+                MessageBox.Show("Pick the SDSG path first!");
+                return;
+            }
 
-            string dir = Path.Combine(Config.SDSGPath, "src", "pai", "assets", "NewGame");
+            string gameName = Interaction.InputBox("Enter new game name:", "Castiel SDK", "MyGame");
+            if (string.IsNullOrWhiteSpace(gameName)) return;
+
+            foreach (char c in Path.GetInvalidFileNameChars())
+                if (gameName.Contains(c))
+                {
+                    MessageBox.Show("Invalid game name.");
+                    return;
+                }
+
+            string dir = Path.Combine(Config.SDSGPath, "src", "pai", "assets", gameName);
+            if (Directory.Exists(dir))
+            {
+                MessageBox.Show("That game already exists.");
+                return;
+            }
+
             Directory.CreateDirectory(dir);
-
             File.WriteAllText(Path.Combine(dir, "run.html"), Templates.RunHtml);
             File.WriteAllText(Path.Combine(dir, "style.css"), Templates.StyleCss);
             File.WriteAllText(Path.Combine(dir, "game.js"), Templates.GameJs);
@@ -54,20 +134,17 @@ public partial class MainForm : Form
             new EditorForm(dir).Show();
         }
 
-        private void ModGame(object? sender, EventArgs e) {
-        
+        private void ModGame()
+        {
             using var f = new FolderBrowserDialog();
             if (f.ShowDialog() == DialogResult.OK)
             {
                 if (!File.Exists(Path.Combine(f.SelectedPath, "sdk.js")))
-                {
                     MessageBox.Show(
                         "WARNING\nThis is either trash SDK or pure JS.\nMahdi spaghetti code detected.",
-                        "Castiel",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning
+                        "Castiel", MessageBoxButtons.OK, MessageBoxIcon.Warning
                     );
-                }
+
                 new EditorForm(f.SelectedPath).Show();
             }
         }

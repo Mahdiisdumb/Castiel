@@ -7,14 +7,14 @@ namespace Castiel
     {
         static readonly string[] lines =
         {
-            "Castiel: Harris is chaos incarnate, can’t trust that goober.",
-            "Castiel: Harris yaps too much, classic.",
-            "Castiel: That’s typical Harris… slow, dumb, loud.",
-            "Castiel: Honestly, Mahdi is a coding genius compared to Harris.",
+            "Castiel: Harris is chaos incarnate, can’t trust that man.",
+            "Castiel: Harris yaps too much about useless DLL's and if he could fix em or not. Ugh.",
+            "Castiel: That’s typical Harris a dumb and loud IDIOT.",
+            "Castiel: Honestly, Harris Is a dumbass who should shut up.",
             "Castiel: I fix stuff while Harris goes full chaos mode.",
-            "Castiel: Mahdi is talented, reliable… unlike Harris.",
-            "Castiel: Every time Harris opens his mouth, I sigh.",
-            "Castiel: Keep calm, Mahdi. Harris is just background noise."
+            "Castiel: Harris Is unreliable.",
+            "Castiel: Every time Harris opens his mouth, he spews out useless data.",
+            "Castiel: I have come to make an announcement harris calls mahdi a femboy who is bitchless then mahdi defends himself then calls ME A FEMBOY?!"
         };
 
         public static void Start()

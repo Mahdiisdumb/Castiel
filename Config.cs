@@ -6,27 +6,55 @@ namespace Castiel
 {
     static class Config
     {
-        private static readonly string file =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
+        private static readonly string ConfigDir =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Castiel");
 
-        public static string? SDSGPath; // nullable to avoid CS8618
+        private static readonly string ConfigFile =
+            Path.Combine(ConfigDir, "config.json");
+
+        public static ConfigData Data { get; private set; } = new();
+
+        public static string? SDSGPath
+        {
+            get => Data.SDSGPath;
+            set => Data.SDSGPath = value;
+        }
 
         public static void Load()
         {
-            if (!File.Exists(file)) return;
             try
             {
-                SDSGPath = JsonSerializer.Deserialize<string>(File.ReadAllText(file));
+                if (!File.Exists(ConfigFile))
+                {
+                    Save(); // write defaults
+                    return;
+                }
+
+                string json = File.ReadAllText(ConfigFile);
+                Data = JsonSerializer.Deserialize<ConfigData>(json) ?? new();
             }
             catch
             {
-                SDSGPath = null;
+                Data = new(); // reset on corruption
             }
         }
 
         public static void Save()
         {
-            File.WriteAllText(file, JsonSerializer.Serialize(SDSGPath));
+            Directory.CreateDirectory(ConfigDir);
+
+            var opts = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            File.WriteAllText(ConfigFile, JsonSerializer.Serialize(Data, opts));
         }
+    }
+
+    class ConfigData
+    {
+        public string? SDSGPath { get; set; }
+        public int ConfigVersion { get; set; } = 1;
     }
 }

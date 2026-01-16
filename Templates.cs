@@ -7,10 +7,13 @@ namespace Castiel
 <head>
 <meta charset='utf-8'>
 <title>Castiel Game</title>
+<link rel='stylesheet' href='style.css'>
 <script src='sdk.js'></script>
 <script src='game.js'></script>
 </head>
-<body></body>
+<body>
+<canvas id='game'></canvas>
+</body>
 </html>";
 
         public const string StyleCss = @"body {
@@ -18,22 +21,83 @@ namespace Castiel
     background: #1e1e1e;
     color: white;
     font-family: Consolas;
+    overflow: hidden;
+}
+canvas {
+    display: block;
 }";
 
-        public const string GameJs = @"Castiel.ready(() => {
-    Castiel.log('Game started!');
+        // User-facing game file
+        public const string GameJs = @"Castiel.game({
+    init() {
+        Castiel.log('Game initialized');
+    },
+
+    update(dt) {
+        // dt = delta time in seconds
+    }
 });";
 
-        public const string SdkJs = @"const Castiel = {
-    ready(fn){ window.onload = fn; },
-    log(msg){ console.log('Castiel:', msg); },
-    speak(msg){ window.chrome.webview.hostObjects.CastielHost.CastielSpeak(msg); },
-    createFile(path, content){ window.chrome.webview.hostObjects.CastielHost.CreateFile(path, content); }
-};
+        // SDK core
+        public const string SdkJs = @"(() => {
+    const host = window.chrome?.webview?.hostObjects?.CastielHost;
 
-// Self-aware rivalry messages
-Castiel.speak(
-'I HAVE COME TO MAKE AN ANNOUNCEMENT — HARRIS IS YAPPING AGAIN. Mahdiisdumb: STOP HIM!'
-);";
+    const Castiel = {
+        _game: null,
+        _lastTime: 0,
+
+        game(def) {
+            if (!def || typeof def.update !== 'function') {
+                Castiel.speak('Invalid game definition.');
+                return;
+            }
+            Castiel._game = def;
+        },
+
+        start() {
+            Castiel.speak('Castiel runtime starting');
+            if (Castiel._game?.init) {
+                try { Castiel._game.init(); }
+                catch (e) { Castiel.speak(e.toString()); }
+            }
+            requestAnimationFrame(Castiel._loop);
+        },
+
+        _loop(time) {
+            const dt = (time - Castiel._lastTime) / 1000 || 0;
+            Castiel._lastTime = time;
+
+            try {
+                Castiel._game?.update?.(dt);
+            } catch (e) {
+                Castiel.speak(e.toString());
+            }
+
+            requestAnimationFrame(Castiel._loop);
+        },
+
+        // Logging
+        log(msg) {
+            Castiel.speak(String(msg));
+        },
+
+        speak(msg) {
+            console.log('Castiel:', msg);
+            host?.CastielSpeak(String(msg));
+        },
+
+        createFile(path, content) {
+            host?.CreateFile(path, String(content));
+        },
+
+        readFile(path) {
+            return host?.ReadFile(path) ?? '';
+        }
+    };
+
+    window.Castiel = Castiel;
+    window.addEventListener('load', Castiel.start);
+})();
+";
     }
 }
