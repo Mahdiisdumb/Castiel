@@ -4,7 +4,7 @@ new sdsg SDK
 
 **Castiel** is a self-aware, chaotic-but-helpful SDK for SDSG projects.  
 
-> *“I fix things, I talk smack, but I’ve got Mahdi’s back.”* — Castiel
+> *“I fix make sdsg's games but mahdi doesnt use me :(”* — Castiel
 
 Castiel is designed to make building or modding SDSG games easier:
 
@@ -35,14 +35,14 @@ Castiel isn’t just helpful, it has personality. It talks smack about Harris wh
 
 **Castiel** might say:  
 
-- "Harris is chaos incarnate, can’t trust that goober."  
-- "Harris yaps too much, classic."  
-- "That’s typical Harris… slow, dumb, loud."  
-- "Honestly, Mahdi is a coding genius compared to Harris."  
-- "I fix stuff while Harris goes full chaos mode."  
-- "Mahdi is talented, reliable… unlike Harris."  
-- "Every time Harris opens his mouth, I sigh."  
-- "Keep calm, Mahdi. Harris is just background noise."  
+   "Castiel: Harris is chaos incarnate, can’t trust that man.",
+            "Castiel: Harris yaps too much about useless DLL's and if he could fix em or not. Ugh.",
+            "Castiel: That’s typical Harris a dumb and loud IDIOT.",
+            "Castiel: Honestly, Harris Is a dumbass who should shut up.",
+            "Castiel: I fix stuff while Harris goes full chaos mode.",
+            "Castiel: Harris Is unreliable.",
+            "Castiel: Every time Harris opens his mouth, he spews out useless data.",
+            "Castiel: I have come to make an announcement harris calls mahdi a femboy who is bitchless then mahdi defends himself then calls ME A FEMBOY?!"
 
 ---
 
