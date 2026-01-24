@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Castiel SDK Documentation</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #1e1e1e; color: #fff; font-family: Consolas, monospace; margin: 0; padding: 20px; }
+        h1, h2, h3 { color: #f0f0f0; }
+        code { background: #2e2e2e; padding: 2px 4px; border-radius: 3px; }
+        pre { background: #2e2e2e; padding: 10px; overflow-x: auto; border-radius: 5px; }
+        section { margin-bottom: 40px; }
+        a { color: #4da6ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <h1>Castiel SDK Documentation</h1>
+
+    <section>
+        <h2>Core Game Functions</h2>
+        <h3>Castiel.game(definition)</h3>
+        <p>Registers your game logic. Requires an <code>update(dt)</code> function. Optionally add <code>init()</code>.</p>
+        <pre><code>Castiel.game({
+    init() { Castiel.log('Game started'); },
+    update(dt) { /* logic */ }
+});</code></pre>
+
+        <h3>Castiel.start()</h3>
+        <p>Starts the game loop. Automatically called on page load.</p>
+    </section>
+
+    <section>
+        <h2>Logging & Debugging</h2>
+        <h3>Castiel.log(msg)</h3>
+        <p>Logs messages to the console and editor.</p>
+        <pre><code>Castiel.log('Hello Castiel');</code></pre>
+
+        <h3>Castiel.speak(msg)</h3>
+        <p>Internal logging that also sends messages to the editor host.</p>
+    </section>
+
+    <section>
+        <h2>File Operations</h2>
+        <h3>Castiel.createFile(path, content)</h3>
+        <p>Creates or overwrites a file in the project folder.</p>
+        <pre><code>Castiel.createFile('data.txt', 'Hello World');</code></pre>
+
+        <h3>Castiel.readFile(path)</h3>
+        <p>Reads a file from the project folder. Returns empty string if not found.</p>
+    </section>
+
+    <section>
+        <h2>Canvas & Drawing Helpers</h2>
+        <ul>
+            <li><strong>Castiel.clear(color='#1e1e1e')</strong> — Clears canvas with background color.</li>
+            <li><strong>Castiel.drawRect(x, y, w, h, color='white')</strong> — Draws a filled rectangle.</li>
+            <li><strong>Castiel.drawImage(img, x, y, w, h)</strong> — Draws an image object.</li>
+            <li><strong>Castiel.loadImage(src, callback)</strong> — Loads an image asynchronously.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Input Handling</h2>
+        <ul>
+            <li><strong>Castiel.keyDown(key)</strong> — Returns true if key is pressed.</li>
+            <li><strong>Castiel.mouse()</strong> — Returns <code>{ x, y, down }</code> with mouse state.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Audio</h2>
+        <ul>
+            <li><strong>Castiel.loadAudio(src)</strong> — Loads an audio file.</li>
+            <li><strong>Castiel.playSound(audio)</strong> — Plays the loaded audio.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Sprites & Helpers</h2>
+        <ul>
+            <li><strong>new Castiel.Sprite(img, x, y, w, h)</strong> — Sprite object with draw function.</li>
+            <li><strong>Castiel.rectCollide(a, b)</strong> — Detects collision between two rectangles.</li>
+        </ul>
+    </section>
+
+    <footer>
+        &copy; 2026 Castiel SDK — SDSG Toolkit
+    </footer>
+
+</body>
+</html>

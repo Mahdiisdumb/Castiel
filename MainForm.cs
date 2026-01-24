@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic; // for InputBox
+using System.Drawing;
 
 namespace Castiel
 {
@@ -16,9 +18,10 @@ namespace Castiel
             Width = 1000;
             Height = 650;
             StartPosition = FormStartPosition.CenterScreen;
+            BackColor = Color.FromArgb(30, 30, 30);
 
             // ===== MENU BAR =====
-            var menu = new MenuStrip();
+            var menu = new MenuStrip { BackColor = Color.FromArgb(45, 45, 48), ForeColor = Color.White };
 
             var fileMenu = new ToolStripMenuItem("File");
             fileMenu.DropDownItems.Add("Set SDSG Path", null, (_, __) => PickPath());
@@ -35,13 +38,12 @@ namespace Castiel
             menu.Items.Add(fileMenu);
             menu.Items.Add(projectMenu);
             menu.Items.Add(helpMenu);
-
             MainMenuStrip = menu;
             Controls.Add(menu);
 
             // ===== STATUS BAR =====
-            var status = new StatusStrip();
-            statusLabel = new ToolStripStatusLabel("No SDSG path selected");
+            var status = new StatusStrip { BackColor = Color.FromArgb(45, 45, 48), ForeColor = Color.White };
+            statusLabel = new ToolStripStatusLabel("No SDSG path selected") { ForeColor = Color.White };
             status.Items.Add(statusLabel);
             Controls.Add(status);
 
@@ -50,13 +52,19 @@ namespace Castiel
             {
                 Dock = DockStyle.Fill,
                 SplitterDistance = 220,
-                FixedPanel = FixedPanel.Panel1
+                FixedPanel = FixedPanel.Panel1,
+                BackColor = Color.FromArgb(30, 30, 30)
             };
             Controls.Add(split);
             split.BringToFront();
 
             // ===== LEFT PANEL =====
-            actions = new ListBox { Dock = DockStyle.Fill };
+            actions = new ListBox
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(37, 37, 38),
+                ForeColor = Color.White
+            };
             actions.Items.Add("New Game");
             actions.Items.Add("Open Game");
             actions.SelectedIndexChanged += (s, e) =>
@@ -75,8 +83,9 @@ namespace Castiel
             {
                 Text = "Castiel SDK\n\nSelect an action from the left panel.",
                 Dock = DockStyle.Fill,
-                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
-                Font = new System.Drawing.Font("Segoe UI", 12),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 12),
+                ForeColor = Color.White
             };
             split.Panel2.Controls.Add(welcome);
 
@@ -86,7 +95,7 @@ namespace Castiel
                 statusLabel.Text = $"SDSG Path: {Config.SDSGPath}";
 
             // ===== Start Rivalry (unhinged popups) =====
-            Rivalry.Start();  // <-- now correctly inside constructor
+            Rivalry.Start();
         }
 
         private void PickPath()
@@ -130,23 +139,28 @@ namespace Castiel
             File.WriteAllText(Path.Combine(dir, "style.css"), Templates.StyleCss);
             File.WriteAllText(Path.Combine(dir, "game.js"), Templates.GameJs);
             File.WriteAllText(Path.Combine(dir, "sdk.js"), Templates.SdkJs);
-
             new EditorForm(dir).Show();
         }
 
-        private void ModGame()
-        {
-            using var f = new FolderBrowserDialog();
-            if (f.ShowDialog() == DialogResult.OK)
-            {
-                if (!File.Exists(Path.Combine(f.SelectedPath, "sdk.js")))
-                    MessageBox.Show(
-                        "WARNING\nThis is either trash SDK or pure JS.\nMahdi spaghetti code detected.",
-                        "Castiel", MessageBoxButtons.OK, MessageBoxIcon.Warning
-                    );
+       private void ModGame()
+{
+    using var f = new FolderBrowserDialog();
+    if (f.ShowDialog() == DialogResult.OK)
+    {
+        var sdkPath = Path.Combine(f.SelectedPath, "sdk.js");
 
-                new EditorForm(f.SelectedPath).Show();
-            }
+        if (!File.Exists(sdkPath))
+        {
+            MessageBox.Show(
+                "WARNING: This game was created without the Castiel SDK.\nSome functionality may not work.",
+                "Castiel SDK Warning",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
         }
+
+        new EditorForm(f.SelectedPath).Show();
+    }
+}
     }
 }
