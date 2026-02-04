@@ -135,14 +135,40 @@ namespace Castiel
             }
 
             Directory.CreateDirectory(dir);
-            File.WriteAllText(Path.Combine(dir, "run.html"), Templates.RunHtml);
-            File.WriteAllText(Path.Combine(dir, "style.css"), Templates.StyleCss);
-            File.WriteAllText(Path.Combine(dir, "game.js"), Templates.GameJs);
-            File.WriteAllText(Path.Combine(dir, "sdk.js"), Templates.SdkJs);
+
+            // Ask user if they want to use the default template
+            var result = MessageBox.Show(
+                "Do you want to use the default Castiel game template?",
+                "Choose Template",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Cancel)
+                return;
+
+            if (result == DialogResult.Yes)
+            {
+                // Use the full template
+                File.WriteAllText(Path.Combine(dir, "run.html"), Templates.RunHtml);
+                File.WriteAllText(Path.Combine(dir, "style.css"), Templates.StyleCss);
+                File.WriteAllText(Path.Combine(dir, "game.js"), Templates.GameJs);
+                File.WriteAllText(Path.Combine(dir, "sdk.js"), Templates.SdkJs);
+            }
+            else
+            {
+                // Empty starter files if user wants to start from scratch
+                File.WriteAllText(Path.Combine(dir, "run.html"), "<!-- Your HTML here -->");
+                File.WriteAllText(Path.Combine(dir, "style.css"), "/* Your CSS here */");
+                File.WriteAllText(Path.Combine(dir, "game.js"), "// Your JS here");
+                File.WriteAllText(Path.Combine(dir, "sdk.js"), Templates.SdkJs);
+            }
+
             new EditorForm(dir).Show();
         }
 
-       private void ModGame()
+
+        private void ModGame()
 {
     using var f = new FolderBrowserDialog();
     if (f.ShowDialog() == DialogResult.OK)
