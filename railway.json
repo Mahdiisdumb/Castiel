@@ -1,5 +1,12 @@
 {
-  "static": true,
-  "build": "echo 'no build needed'",
-  "outputDirectory": "Website"
+  "services": [
+    {
+      "name": "sdk-website",
+      "static": true,
+      "build": {
+        "builder": "static",
+        "outputDirectory": "Website"
+      }
+    }
+  ]
 }
