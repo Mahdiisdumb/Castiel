@@ -1,82 +1,110 @@
-# Castiel
-new sdsg SDK
 # Castiel SDK
 
-**Castiel** is a self-aware, chaotic-but-helpful SDK for SDSG projects.  
+Castiel is an SDK and helper toolset for building and modding SDSG games. This repository contains the desktop tooling and documentation for creating a lightweight HTML/JS game project with prebuilt helpers.
 
-> *“I fix make sdsg's games but mahdi doesnt use me :(”* — Castiel
+This README is a concise reference. A full HTML documentation file is available at `docs/castiel_sdk_documentation.html` and can be copied to other repositories for distribution.
 
-Castiel is designed to make building or modding SDSG games easier:
+Key features
 
-- Lets you **point to your SDSG directory** and load projects easily.  
-- Supports creating new games or modding existing ones.  
-- Automatically creates project files:  
-  - `run.html`  
-  - `style.css`  
-  - `game.js`  
-  - `sdk.js` (hidden, prebuilt helper functions)  
-- Has a **built-in HTML editor preview** for live editing.  
-- Provides **IDE-like interface** with buttons for creating/modding games.  
-- Warns if a project lacks `sdk.js` or was made with a “trash SDK.”  
+- Create or mod SDSG-compatible projects quickly
+- Auto-generate project skeleton: `run.html`, `style.css`, `game.js`, `sdk.js`
+- Live HTML preview and basic in-editor file operations
+- Small, focused API for game loop, input, drawing, and file operations
 
 ---
 
-## Rivalry System
+## Quick start
 
-Castiel isn’t just helpful, it has personality. It talks smack about Harris while praising Mahdi:  
+1. Run `Castiel.exe` (desktop app) and point it to your SDSG project folder.
+2. Use the UI to create a new game or open an existing one.
+3. Edit `game.js` / `sdk.js` in the built-in editor and preview `run.html` live.
 
-- **Castiel vs Harris:**  
-  Castiel will randomly insult Harris when running the SDK.  
-- **Castiel vs Mahdi:**  
-  Castiel will never insult Mahdi — only compliments or praises his coding genius.  
-- **Popups:** Random popup messages appear while using the SDK, making it feel alive and chaotic.  
-
-### Sample Popups
-
-**Castiel** might say:  
-
-   "Castiel: Harris is chaos incarnate, can’t trust that man.",
-            "Castiel: Harris yaps too much about useless DLL's and if he could fix em or not. Ugh.",
-            "Castiel: That’s typical Harris a dumb and loud IDIOT.",
-            "Castiel: Honestly, Harris Is a dumbass who should shut up.",
-            "Castiel: I fix stuff while Harris goes full chaos mode.",
-            "Castiel: Harris Is unreliable.",
-            "Castiel: Every time Harris opens his mouth, he spews out useless data.",
-            "Castiel: I have come to make an announcement harris calls mahdi a femboy who is bitchless then mahdi defends himself then calls ME A FEMBOY?!"
+If you only need to use the SDK in a web project, copy `sdk.js` into your game's root and include it from `run.html`.
 
 ---
 
-## Usage
-
-1. Launch **Castiel.exe**.  
-2. Select your **SDSG project directory** (the SDK remembers this path even after closing).  
-3. Use buttons to **create a new game** or **mod an existing game**.  
-4. The editor shows your project files and allows live HTML preview.  
-5. Popups may appear from Castiel or Harris — it’s part of the fun.  
-
----
-
-## File Structure
-
-When creating a new game, Castiel automatically sets up:
+## Project layout created by Castiel
 
 src/pai/assets/[GameName]/
-├─ run.html # Main HTML file
-├─ style.css # CSS styles
-├─ game.js # Game logic
-└─ sdk.js # Hidden SDK helper functions
-
-yaml
-Copy code
-
-- `sdk.js` contains prebuilt functions to make coding easier.  
-- Modding a game without `sdk.js` triggers a warning about potential spaghetti code.  
+- `run.html` — main boot file / demo runner
+- `style.css` — default styles for the demo
+- `game.js` — user game logic
+- `sdk.js` — helper library (recommended)
 
 ---
 
-## Notes
+## API reference (summary)
 
-- Castiel is **self-aware** and chaotic, just like Harris.  
-- Popups are part of the rivalry system: Castiel insults Harris, praises Mahdi.  
-- The HTML preview is accurate and updates live.  
-- Enjoy the chaotic, alive feeling of this SDK — it’s meant to be playful.
+All examples assume `sdk.js` exposes a global `Castiel` object.
+
+- `Castiel.game(definition)`
+  - Registers your game with the engine. `definition` must include `update(dt)` and may include `init()` and `destroy()`.
+  - Example:
+    ```js
+    Castiel.game({
+      init() { Castiel.log('Game started'); },
+      update(dt) { /* frame logic */ }
+    });
+    ```
+
+- `Castiel.start()` — Starts the game loop. Typically called automatically but can be invoked manually.
+
+- `Castiel.log(msg)` — Console + editor logging helper.
+- `Castiel.speak(msg)` — Internal logging that may forward messages to the host/editor.
+
+- File operations
+  - `Castiel.createFile(path, content)` — Creates or overwrites a file. Returns a boolean or throws on host errors.
+  - `Castiel.readFile(path)` — Reads a file; returns string or empty string on missing file. Prefer async patterns if exposed.
+
+- Canvas & drawing
+  - `Castiel.clear(color)` — Clear canvas with color (default `#1e1e1e`).
+  - `Castiel.drawRect(x, y, w, h, color)` — Draw filled rectangle.
+  - `Castiel.loadImage(src, callback)` — Loads an image and calls `callback(img)` on success. Use error handling for missing assets.
+  - `Castiel.drawImage(img, x, y, w, h)` — Draw an image object previously loaded.
+
+- Input
+  - `Castiel.keyDown(key)` — Returns true while a key is pressed.
+  - `Castiel.mouse()` — Returns `{ x, y, down }` with mouse state.
+
+- Audio
+  - `Castiel.loadAudio(src)` — Loads audio object (may return a Promise or audio element).
+  - `Castiel.playSound(audio)` — Plays a loaded sound.
+
+- Helpers
+  - `new Castiel.Sprite(img, x, y, w, h)` — Sprite with `draw()` and simple properties.
+  - `Castiel.rectCollide(a, b)` — Rectangle collision detection. Each rect: `{ x, y, w, h }`.
+
+---
+
+## Error handling and best practices
+
+- Validate paths before calling file functions; prefer try/catch around host operations.
+- For asset loading use callbacks or Promises and handle failures (fallback images/sounds).
+- Release resources when not needed (`destroy()` hooks) to avoid memory leaks.
+- Keep `update(dt)` fast and avoid blocking operations; use async tasks for IO.
+
+Example pattern for loading assets safely:
+
+```js
+const assets = {};
+Castiel.loadImage('player.png', img => { assets.player = img; });
+// In update: if (!assets.player) return; // wait until loaded
+```
+
+---
+
+## Documentation HTML
+
+An HTML version of the SDK documentation is available at `docs/castiel_sdk_documentation.html`. You can copy that file into another repository (for example the repo that hosts the website or distribution) — it's standalone and links back to this README.
+
+---
+
+## Contributing
+
+Contributions welcome. Open issues or PRs for bug fixes, API improvements, or documentation. Keep changes focused and include tests where possible.
+
+---
+
+## License
+
+See `LICENSE` or the repository root for license details.
